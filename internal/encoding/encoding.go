@@ -11,10 +11,11 @@ import (
     "io/ioutil"
     "github.com/h2non/filetype"
     "github.com/auyer/steganography"
+    "github.com/justfancy64/pwmng/internal/state"
 )
 
-func FileDetector(file string) error {
-    buf, err := ioutil.ReadFile(file)
+func FileDetector(s *state.State) error {
+    buf, err := ioutil.ReadFile(s.File)
     if err != nil {
     log.Println(err)
     }
@@ -25,13 +26,26 @@ func FileDetector(file string) error {
     if kind == filetype.Unknown {
 	log.Println("unknown file type")
     }
-    log.Printf("file type: %s.\n", kind.Extension)
+
+    if kind.Extension == "jpeg" {
+	s.FileType = kind.Extension
+
+    }
+
+    if kind.Extension == "png" {
+	s.FileType = kind.Extension
+
+    }
     return nil
 
 }
 
-func Encode(file string, message []byte) error {
-    inFile, err := os.Open(file)
+type quissy struct {
+    femboyscore int
+    kittenname string
+}
+func EncodePNG(s *state.State) error {
+    inFile, err := os.Open(s.File)
     if err != nil {
     log.Println(err)
     }
@@ -43,11 +57,11 @@ func Encode(file string, message []byte) error {
 	log.Println(err)
     }
     w := new(bytes.Buffer)
-    err = steganography.Encode(w, img, message)
+    err = steganography.Encode(w, img, []byte(s.Args[0]))
     if err != nil {
 	log.Println(err)
     }
-    outFile, err := os.Create(file)
+    outFile, err := os.Create(s.File)
     if err != nil {
 	log.Println(err)
     }
@@ -61,8 +75,8 @@ func Encode(file string, message []byte) error {
 
 
 
-func EncodeJPG(file string, message []byte) error {
-    inFile, err := os.Open(file)
+func EncodeJPG(s *state.State) error {
+    inFile, err := os.Open(s.File)
     if err != nil {
     log.Println(err)
     }
@@ -74,11 +88,11 @@ func EncodeJPG(file string, message []byte) error {
 	log.Println(err)
     }
     w := new(bytes.Buffer)
-    err = steganography.Encode(w, img, message)
+    err = steganography.Encode(w, img,[]byte(s.Args[0]))
     if err != nil {
 	log.Println(err)
     }
-    outFile, err := os.Create(file)
+    outFile, err := os.Create(s.File)
     if err != nil {
 	log.Println(err)
     }
