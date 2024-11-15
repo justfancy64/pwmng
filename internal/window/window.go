@@ -29,6 +29,12 @@ func InputWindow(s *state.State) fyne.App {
     return
     }
     s.File = inputline.Text
+    err = encoding.FileDetector(s)
+    modetype := s.Mode + s.FileType
+    fmt.Println(modetype)
+    if err != nil {
+      fmt.Println(err)
+    }
     w.Hide()
     ModeWindow(s, a)
 
@@ -56,9 +62,15 @@ func ModeWindow(s *state.State,a fyne.App) {
 	button := container.NewVBox(widget.NewButton("encode", func(){
 		  s.Mode = "encode"
 		  w.Hide()
+		  modetype := s.Mode + s.FileType
+		  fmt.Println(modetype)
 		  EncodingWindow(s,a)
 		  }))
-	button2 := container.NewVBox(widget.NewButton("decode", func(){s.Mode = "decode"}))
+	button2 := container.NewVBox(widget.NewButton("decode", func(){
+		  s.Mode = "decode"
+		  w.Hide()
+		  DecodingWindow(s,a)
+		   }))
 	content := container.New(layout.NewVBoxLayout(), headercontainer,button,button2)
 	w.SetContent(content)
 
@@ -82,18 +94,43 @@ func EncodingWindow(s *state.State,a fyne.App) {
   inputPassword := widget.NewEntry()
   inputPassword.SetPlaceHolder("Tip: enter multile entries seperated by spaces")
   Confirm := widget.NewButton("Confirm", func(){
-    data := [2]strings{inputComment.Text,inputPassword.Text}
-    s.Data = data
+    data := inputComment.Text + inputPassword.Text
+    s.Data = append(s.Data, data)
     encoding.StartEncoding(s)
      
   })
 
+  exit := widget.NewButton("Exit", func(){
+    a.Quit()
+  })
 
-
-  content := container.New(layout.NewVBoxLayout(),titlecont,inputComment,inputPassword)
+  content := container.New(layout.NewVBoxLayout(),titlecont,inputComment,inputPassword,Confirm,exit)
 
 
   w.SetContent(content)
   w.Show()
   
+}
+
+
+
+func DecodingWindow(s *state.State,a fyne.App) {
+  w := a.NewWindow("Decoding Window")
+  title := widget.NewLabel("Data exracted from image")
+  titlecont := container.New(layout.NewHBoxLayout(), layout.NewSpacer(),title,layout.NewSpacer())
+  encoding.StartEncoding(s)
+
+  var str string
+  //fmt.Println(s.Data)
+  for _,line := range s.Data{
+    str += line
+  }
+  data := widget.NewLabel(str)
+  
+  exit := widget.NewButton("Exit", func(){
+    a.Quit()
+  })
+  content := container.New(layout.NewVBoxLayout(),titlecont,data,exit)
+  w.SetContent(content)
+  w.Show()
 }

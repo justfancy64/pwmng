@@ -7,7 +7,7 @@ import(
 
 type State struct {
 	Mode string
-	Data [2]string
+	Data []string
 	File string
 	FileType string
 

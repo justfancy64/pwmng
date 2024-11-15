@@ -5,6 +5,7 @@ import(
     "fmt"
     "os"
     "image/png"
+    "encoding/json"
     "image/jpeg"
     "github.com/auyer/steganography"
     "github.com/justfancy64/pwmng/internal/state"
@@ -16,7 +17,7 @@ import(
 
 
 
-func DecodePNG(s *state.State) error {
+func DecodePNG(s *state.State, data EncryptedStruct) error {
     inFile, err := os.Open(s.File)
     if err != nil {
       return err
@@ -29,6 +30,12 @@ func DecodePNG(s *state.State) error {
     }
     sizeofmsg := steganography.GetMessageSizeFromImage(img)
     msg := steganography.Decode(sizeofmsg, img)
+    var content EncryptedStruct
+    err = json.Unmarshal(msg, &content)
+    if err != nil {
+    return err
+  }
+    s.Data = content.Data
 
 
     fmt.Println(string(msg))
@@ -37,7 +44,7 @@ func DecodePNG(s *state.State) error {
 }
 
 
-func DecodeJPEG(s *state.State) error {
+func DecodeJPEG(s *state.State, data EncryptedStruct) error {
     infile, err := os.Open(s.File)
     if err != nil {
       return err
@@ -50,7 +57,13 @@ func DecodeJPEG(s *state.State) error {
     }
     sizeofmsg := steganography.GetMessageSizeFromImage(img)
     msg := steganography.Decode(sizeofmsg, img)
-    
+    var content EncryptedStruct
+    err = json.Unmarshal(msg, &content)
+    if err != nil {
+    return err
+  }
+    fmt.Println("idk anymore")
+    s.Data = content.Data
     fmt.Println(string(msg))
     return nil
 

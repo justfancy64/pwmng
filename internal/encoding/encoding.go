@@ -9,6 +9,7 @@ import (
     "os"
     "bytes"
     "io/ioutil"
+    "encoding/json"
     "github.com/h2non/filetype"
     "github.com/auyer/steganography"
     "github.com/justfancy64/pwmng/internal/state"
@@ -25,17 +26,21 @@ func FileDetector(s *state.State) error {
     }
     if kind == filetype.Unknown {
 	log.Println("unknown file type")
+	s.FileType = "UnKnown"
     }
 
-    if kind.Extension == "jpeg" {
-	s.FileType = kind.Extension
+    if kind.Extension == "jpg" {
+	s.FileType = "JPEG"
 
     }
 
     if kind.Extension == "png" {
-	s.FileType = kind.Extension
+	s.FileType = "PNG" 
 
-    }
+    } else {
+
+    s.FileType = kind.Extension
+}
     return nil
 
 }
@@ -44,7 +49,7 @@ type quissy struct {
     femboyscore int
     kittenname string
 }
-func EncodePNG(s *state.State) error {
+func EncodePNG(s *state.State, data EncryptedStruct) error {
     inFile, err := os.Open(s.File)
     if err != nil {
     log.Println(err)
@@ -57,7 +62,11 @@ func EncodePNG(s *state.State) error {
 	log.Println(err)
     }
     w := new(bytes.Buffer)
-    err = steganography.Encode(w, img, []byte(s.Args[0]))
+    bdata,err := json.Marshal(data)
+    if err != nil {
+	return err
+    }
+    err = steganography.Encode(w, img, bdata)
     if err != nil {
 	log.Println(err)
     }
@@ -66,7 +75,10 @@ func EncodePNG(s *state.State) error {
 	log.Println(err)
     }
 
-    w.WriteTo(outFile)
+    _,err = w.WriteTo(outFile)
+    if err != nil {
+	return err
+    }
     outFile.Close()
     return nil 
 
@@ -75,7 +87,7 @@ func EncodePNG(s *state.State) error {
 
 
 
-func EncodeJPG(s *state.State) error {
+func EncodeJPEG(s *state.State, data EncryptedStruct) error {
     inFile, err := os.Open(s.File)
     if err != nil {
     log.Println(err)
@@ -88,7 +100,11 @@ func EncodeJPG(s *state.State) error {
 	log.Println(err)
     }
     w := new(bytes.Buffer)
-    err = steganography.Encode(w, img,[]byte(s.Args[0]))
+    bdata, err := json.Marshal(data)
+    if err  != nil {
+	return err
+    }
+    err = steganography.Encode(w, img,bdata)
     if err != nil {
 	log.Println(err)
     }
@@ -97,7 +113,10 @@ func EncodeJPG(s *state.State) error {
 	log.Println(err)
     }
 
-    w.WriteTo(outFile)
+    _,err = w.WriteTo(outFile)
+    if err != nil {
+	return err
+    }
     outFile.Close()
     log.Println("encoded successfully")
     return nil 
