@@ -2,7 +2,7 @@ package state
 
 import(
   "fyne.io/fyne/v2"
-	"fmt"
+  "fmt"
 )
 
 type State struct {
@@ -10,11 +10,17 @@ type State struct {
 	Data []string
 	File string
 	FileType string
+	Window   fyne.Window
+	App      fyne.App
 
 }
 
 
 
 func (s *State) Callback(position fyne.Position, uri []fyne.URI) {
-  fmt.Println(uri[0])
+  s.File = uri[0].Path()
+  fmt.Println(uri[0].Path())
+
+
+  
 }

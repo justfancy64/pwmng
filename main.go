@@ -1,7 +1,6 @@
 package main
 
 import (
- // "github.com/justfancy64/pwmng/internal/window"
   "github.com/justfancy64/pwmng/internal/state"
   "github.com/justfancy64/pwmng/internal/window"
 
@@ -9,9 +8,10 @@ import (
 )
 
 func main() {
-	var st state.State
-	app := window.InputWindow(&st)
-	app.Run()
+	var s state.State
+	s.App = window.InputWindow(&s)
+	s.App.Run()
 
 }
+
 

@@ -20,6 +20,7 @@ type Functions struct{
 
 
 func StartEncoding(s *state.State) {
+  FileDetector(s)
 
   var funcs Functions
   funcs.Encoders = make(map[string]func(s *state.State,data EncryptedStruct) error)

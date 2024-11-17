@@ -12,17 +12,24 @@ import (
   "os"
 
 )
+var App fyne.App
+
+car
 
 func InputWindow(s *state.State) fyne.App {
   a := app.New()
   w := a.NewWindow("hello")
+  s.Window = w
 
   hello := widget.NewLabel("Welcome to Pogger Password manager\n Drop in a file or enter the path below")
   headercontainer := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), hello,layout.NewSpacer())
   inputline := widget.NewEntry()
   inputline.SetPlaceHolder("eg: /home/Downloads/cutepic.jpeg")
   confirm := widget.NewButton("Confirm", func(){
-    _,err := os.Open(inputline.Text)
+    if s.File == ""{
+    s.File = inputline.Text
+    }
+    _,err := os.Open(s.File)
     if err != nil {
     fmt.Println("not a valid address")
 
@@ -43,9 +50,10 @@ func InputWindow(s *state.State) fyne.App {
   content := container.New(layout.NewVBoxLayout(), headercontainer,inputline,confirm) // vertical container input line will be added here
   w.SetContent(content)
 
-  w.SetOnDropped(s.Callback)
   w.Show()
 
+  w.SetOnDropped(s.Callback)
+  w.Hide()
   return a
 }
 
@@ -53,7 +61,7 @@ func InputWindow(s *state.State) fyne.App {
 
 
 
-func ModeWindow(s *state.State,a fyne.App) {
+func    ModeWindow(s *state.State,a fyne.App) {
 	//a := app.New()
 	w := a.NewWindow("Hello")
 
