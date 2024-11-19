@@ -34,7 +34,7 @@ func FileDetector(s *state.State) error {
 
     }
 
-    if kind.Extension == "png" {
+    if kind.Extension == "png" || kind.Extension =="PNG" {
 	s.FileType = "PNG" 
 
     } else {
@@ -61,6 +61,18 @@ func EncodePNG(s *state.State, data EncryptedStruct) error {
     if err != nil {
 	log.Println(err)
     }
+    sizeofmsg := steganography.GetMessageSizeFromImage(img)
+    msg := steganography.Decode(sizeofmsg, img)
+    var content EncryptedStruct
+    err = json.Unmarshal(msg, &content)
+    if err != nil {
+    return err
+    }
+    for _,entry := range content.Contents {
+	data.Contents = append(data.Contents, entry)
+    }
+
+
     w := new(bytes.Buffer)
     bdata,err := json.Marshal(data)
     if err != nil {
@@ -99,6 +111,19 @@ func EncodeJPEG(s *state.State, data EncryptedStruct) error {
     if err != nil {
 	log.Println(err)
     }
+    sizeofmsg := steganography.GetMessageSizeFromImage(img)
+    msg := steganography.Decode(sizeofmsg, img)
+    var content EncryptedStruct
+    err = json.Unmarshal(msg, &content)
+    if err != nil {
+    return err
+    }
+    for _,entry := range content.Contents {
+	data.Contents = append(data.Contents, entry)
+    }
+
+
+
     w := new(bytes.Buffer)
     bdata, err := json.Marshal(data)
     if err  != nil {

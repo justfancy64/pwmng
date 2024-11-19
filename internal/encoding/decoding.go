@@ -35,7 +35,13 @@ func DecodePNG(s *state.State, data EncryptedStruct) error {
     if err != nil {
     return err
   }
+    if len(content.Data) == 0 {
+    return fmt.Errorf("not data to be found")
+  }
     s.Data = content.Data
+    s.Contents = content.Contents
+
+  
 
 
     fmt.Println(string(msg))
@@ -62,8 +68,11 @@ func DecodeJPEG(s *state.State, data EncryptedStruct) error {
     if err != nil {
     return err
   }
-    fmt.Println("idk anymore")
+    if len(content.Data) == 0 {
+    return fmt.Errorf("not data to be found")
+  }
     s.Data = content.Data
+    s.Contents = content.Contents
     fmt.Println(string(msg))
     return nil
 
