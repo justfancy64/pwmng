@@ -154,6 +154,7 @@ func EncodingWindow(s *state.State) {
 		s.Username = inputUsername.Text
 		s.Password = inputPassword.Text
 		encoding.StartEncoding(s)
+		_ = Completed(s)
 
 	})
 
@@ -220,4 +221,15 @@ func DecodingWindow(s *state.State) {
 	content.Add(exit)
 	s.Window.SetContent(content)
 	//w.Show()
+}
+
+func Completed(s *state.State) *fyne.Container {
+	text := widget.NewLabel("Data successfuly encrypted")
+	row := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), text,layout.NewSpacer())
+	exit := widget.NewButton("Exit",func(){
+		s.App.Quit()
+	})
+	content := container.New(layout.NewVBoxLayout(),row,layout.NewSpacer(), exit)
+	s.Window.SetContent(content)
+	return content
 }
