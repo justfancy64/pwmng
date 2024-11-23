@@ -3,7 +3,6 @@ package window
 import (
 	"fmt"
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
@@ -14,13 +13,14 @@ import (
 	"image/color"
 	//"fyne.io/fyne/v2/canvas"
 	"os"
+	"fyne.io/fyne/v2/app"
 )
 
-var App fyne.App
 
 func WindowParams(s *state.State) {
 	var _ myTheme
 	s.Window.SetMaster()
+	s.Window.CenterOnScreen()
 	s.Window.SetTitle("Pogger Password Manager")
 	s.Window.Resize(fyne.Size{
 		Width:  400,
@@ -29,15 +29,12 @@ func WindowParams(s *state.State) {
 
 	//blue := color.NRGBA{R: 0, G: 0, B: 180, A: 255}
 
-	s.Window.CenterOnScreen()
-	s.App.Settings().SetTheme(&myTheme{})
 
 }
 
 type myTheme struct {
 }
 
-var _ fyne.Theme = (*myTheme)(nil)
 
 func (m myTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant) color.Color {
 	if name == theme.ColorNameBackground {
@@ -66,11 +63,13 @@ func (m myTheme) Size(name fyne.ThemeSizeName) float32 {
 	return theme.DefaultTheme().Size(name)
 }
 
-func InputWindow(s *state.State) fyne.App {
-	a := app.New()
-	w := a.NewWindow("pogger password manager")
-	s.Window = w
-	WindowParams(s)
+func CreateApp(s *state.State) {
+	s.App = app.New()
+}
+
+func InputWindow(s *state.State) *fyne.Container{
+
+	
 
 	hello := widget.NewLabel("Welcome to Pogger Password manager\n Drop in a file or enter the path below")
 	headercontainer := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), hello, layout.NewSpacer())
@@ -94,22 +93,22 @@ func InputWindow(s *state.State) fyne.App {
 			fmt.Println(err)
 		}
 		//w.Hide()
-		ModeWindow(s, a)
+		ModeWindow(s)
 
 	})
 	exit := widget.NewButton("Exit", func() {
-		a.Quit()
+		s.App.Quit()
 	})
 	content := container.New(layout.NewVBoxLayout(), headercontainer, inputline, confirm, exit) // vertical container input line will be added here
-	w.SetContent(content)
+	s.Window.SetContent(content)
 
-	w.Show()
 
-	w.SetOnDropped(s.Callback)
-	return a
+	s.Window.Show()
+	s.Window.SetOnDropped(s.Callback)
+	return content
 }
 
-func ModeWindow(s *state.State, a fyne.App) {
+func ModeWindow(s *state.State) *fyne.Container {
 	//a := app.New()
 	//w := a.NewWindow("Hello")
 
@@ -120,25 +119,25 @@ func ModeWindow(s *state.State, a fyne.App) {
 		//w.Hide()
 		modetype := s.Mode + s.FileType
 		fmt.Println(modetype)
-		EncodingWindow(s, a)
+		EncodingWindow(s)
 	}))
 	button2 := container.NewVBox(widget.NewButton("decode", func() {
 		s.Mode = "decode"
 		//w.Hide()
-		DecodingWindow(s, a)
+		DecodingWindow(s)
 	}))
 	exit := widget.NewButton("Exit", func() {
 		s.App.Quit()
 	})
 	content := container.New(layout.NewVBoxLayout(), headercontainer, button, button2, exit)
-	s.Window.SetContent(content)
+	return content
 
 	//w.SetOnDropped(s.Callback)
 
 	//w.Show()
 }
 
-func EncodingWindow(s *state.State, a fyne.App) {
+func EncodingWindow(s *state.State) {
 	//w := a.NewWindow("Encoding Window")
 	title := widget.NewLabel("Enter the data u wish to encode")
 	titlecont := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), title, layout.NewSpacer())
@@ -159,7 +158,7 @@ func EncodingWindow(s *state.State, a fyne.App) {
 	})
 
 	exit := widget.NewButton("Exit", func() {
-		a.Quit()
+		s.App.Quit()
 	})
 	plabel := widget.NewLabel("new password will be copied to your clipboard")
 	pgenbtn := widget.NewButton("generate password", func() {
@@ -169,14 +168,14 @@ func EncodingWindow(s *state.State, a fyne.App) {
 	})
 	passwordcont := container.New(layout.NewHBoxLayout(), pgenbtn, plabel)
 
-	content := container.New(layout.NewVBoxLayout(), titlecont, inputComment, inputUsername, inputPassword, passwordcont, Confirm, exit)
+	content := container.New(layout.NewVBoxLayout(), titlecont, inputComment, inputUsername, inputPassword, passwordcont, layout.NewSpacer(),Confirm, exit)
 
 	s.Window.SetContent(content)
 	//w.Show()
 
 }
 
-func DecodingWindow(s *state.State, a fyne.App) {
+func DecodingWindow(s *state.State) {
 	//w := a.NewWindow("Decoding Window")
 	title := widget.NewLabel("Data exracted from image")
 	titlecont := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), title, layout.NewSpacer())
@@ -202,7 +201,8 @@ func DecodingWindow(s *state.State, a fyne.App) {
 			s.Window.Clipboard().SetContent(entry.Password)
 		})
 
-		dataline := container.New(layout.NewHBoxLayout(), cmnt, userbutton, passbutton)
+		dataline := container.New(layout.NewHBoxLayout(), cmnt, layout.NewSpacer(),userbutton, passbutton)
+
 		content.Add(dataline)
 
 		data = append(data, dataline)
@@ -210,12 +210,13 @@ func DecodingWindow(s *state.State, a fyne.App) {
 	fmt.Println(len(data))
 
 	exit := widget.NewButton("Exit", func() {
-		a.Quit()
+		s.App.Quit()
 	})
 	if len(data) == 0 {
 		fmt.Println("not data to be found")
 		return
 	}
+	content.Add(layout.NewSpacer())
 	content.Add(exit)
 	s.Window.SetContent(content)
 	//w.Show()
