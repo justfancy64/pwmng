@@ -103,7 +103,6 @@ func InputWindow(s *state.State) *fyne.Container{
 	s.Window.SetContent(content)
 
 
-	s.Window.Show()
 	s.Window.SetOnDropped(s.Callback)
 	return content
 }
@@ -112,7 +111,7 @@ func ModeWindow(s *state.State) *fyne.Container {
 	//a := app.New()
 	//w := a.NewWindow("Hello")
 
-	hello := widget.NewLabel("Use encode to if u want to add a password or decode to retrieve one")
+	hello := widget.NewLabel("Use encode to add a password or decode to retrieve image contents")
 	headercontainer := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), hello, layout.NewSpacer())
 	button := container.NewVBox(widget.NewButton("encode", func() {
 		s.Mode = "encode"
@@ -126,10 +125,13 @@ func ModeWindow(s *state.State) *fyne.Container {
 		//w.Hide()
 		DecodingWindow(s)
 	}))
+	back := widget.NewButton("Back", func() {
+		s.Window.SetContent(InputWindow(s))
+	})
 	exit := widget.NewButton("Exit", func() {
 		s.App.Quit()
 	})
-	content := container.New(layout.NewVBoxLayout(), headercontainer, button, button2, exit)
+	content := container.New(layout.NewVBoxLayout(), headercontainer, button, button2,layout.NewSpacer(),back, exit)
 	return content
 
 	//w.SetOnDropped(s.Callback)
@@ -158,6 +160,11 @@ func EncodingWindow(s *state.State) {
 
 	})
 
+	back := widget.NewButton("Back", func(){
+		s.Window.SetContent(ModeWindow(s))
+
+	})
+
 	exit := widget.NewButton("Exit", func() {
 		s.App.Quit()
 	})
@@ -169,7 +176,7 @@ func EncodingWindow(s *state.State) {
 	})
 	passwordcont := container.New(layout.NewHBoxLayout(), pgenbtn, plabel)
 
-	content := container.New(layout.NewVBoxLayout(), titlecont, inputComment, inputUsername, inputPassword, passwordcont, layout.NewSpacer(),Confirm, exit)
+	content := container.New(layout.NewVBoxLayout(), titlecont, inputComment, inputUsername, inputPassword, passwordcont, layout.NewSpacer(),Confirm, back,exit)
 
 	s.Window.SetContent(content)
 	//w.Show()
@@ -209,7 +216,10 @@ func DecodingWindow(s *state.State) {
 		data = append(data, dataline)
 	}
 	fmt.Println(len(data))
+	back := widget.NewButton("Back", func(){
+		s.Window.SetContent(ModeWindow(s))
 
+	})
 	exit := widget.NewButton("Exit", func() {
 		s.App.Quit()
 	})
@@ -218,6 +228,7 @@ func DecodingWindow(s *state.State) {
 		return
 	}
 	content.Add(layout.NewSpacer())
+	content.Add(back)
 	content.Add(exit)
 	s.Window.SetContent(content)
 	//w.Show()
@@ -226,10 +237,13 @@ func DecodingWindow(s *state.State) {
 func Completed(s *state.State) *fyne.Container {
 	text := widget.NewLabel("Data successfuly encrypted")
 	row := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), text,layout.NewSpacer())
+	back := widget.NewButton("Back", func(){
+		EncodingWindow(s)
+	})
 	exit := widget.NewButton("Exit",func(){
 		s.App.Quit()
 	})
-	content := container.New(layout.NewVBoxLayout(),row,layout.NewSpacer(), exit)
+	content := container.New(layout.NewVBoxLayout(),row,layout.NewSpacer(), back,exit)
 	s.Window.SetContent(content)
 	return content
 }

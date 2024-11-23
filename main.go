@@ -17,8 +17,10 @@ func main() {
 	window.InputWindow(&s)
 	s.WinContent["mode"] = window.ModeWindow
 
+	s.Window.Show()
 
 	s.App.Run()
+
 
 	//s.Window.Show()
 
